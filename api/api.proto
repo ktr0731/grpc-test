@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package api;
+
+service Example {
+  rpc Unary (UnaryRequest) returns (UnaryResponse) {}
+  rpc UnaryMessage (UnaryMessageRequest) returns (UnaryResponse) {}
+  rpc UnaryRepeated (UnaryRepeatedRequest) returns (UnaryResponse) {}
+  rpc UnaryRepeatedMessage (UnaryRepeatedMessageRequest) returns (UnaryResponse) {}
+  rpc UnaryMap (UnaryMapRequest) returns (UnaryResponse) {}
+  rpc UnaryMapMessage (UnaryMapMessageRequest) returns (UnaryResponse) {}
+  rpc UnaryOneof (UnaryOneofRequest) returns (UnaryResponse) {}
+  rpc UnaryEnum (UnaryEnumRequest) returns (UnaryResponse) {}
+}
+
+message UnaryRequest {
+  string name = 1;
+}
+
+message UnaryResponse {
+  string message = 1;
+}
+
+message Name {
+  string first_name = 1;
+  string last_name = 2;
+}
+
+message UnaryMessageRequest {
+  Name name = 1;
+}
+
+message UnaryRepeatedRequest {
+  repeated string name = 1;
+}
+
+message UnaryRepeatedMessageRequest {
+  repeated Name name = 1;
+}
+
+message UnaryMapRequest {
+  map<string, string> kvs = 1;
+}
+
+message UnaryMapMessageRequest {
+  map<string, Name> kvs = 1;
+}
+
+message UnaryOneofRequest {
+  oneof name {
+    Name msg = 1;
+    string plain = 2;
+  }
+}
+
+enum Gender {
+  Male = 0;
+  Female = 1;
+}
+
+message UnaryEnumRequest {
+  Gender gender = 1;
+}
