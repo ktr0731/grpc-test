@@ -3,21 +3,24 @@ syntax = "proto3";
 package api;
 
 service Example {
-  rpc Unary (UnaryRequest) returns (UnaryResponse) {}
-  rpc UnaryMessage (UnaryMessageRequest) returns (UnaryResponse) {}
-  rpc UnaryRepeated (UnaryRepeatedRequest) returns (UnaryResponse) {}
-  rpc UnaryRepeatedMessage (UnaryRepeatedMessageRequest) returns (UnaryResponse) {}
-  rpc UnaryMap (UnaryMapRequest) returns (UnaryResponse) {}
-  rpc UnaryMapMessage (UnaryMapMessageRequest) returns (UnaryResponse) {}
-  rpc UnaryOneof (UnaryOneofRequest) returns (UnaryResponse) {}
-  rpc UnaryEnum (UnaryEnumRequest) returns (UnaryResponse) {}
+  rpc Unary (SimpleRequest) returns (SimpleResponse) {}
+  rpc UnaryMessage (UnaryMessageRequest) returns (SimpleResponse) {}
+  rpc UnaryRepeated (UnaryRepeatedRequest) returns (SimpleResponse) {}
+  rpc UnaryRepeatedMessage (UnaryRepeatedMessageRequest) returns (SimpleResponse) {}
+  rpc UnaryMap (UnaryMapRequest) returns (SimpleResponse) {}
+  rpc UnaryMapMessage (UnaryMapMessageRequest) returns (SimpleResponse) {}
+  rpc UnaryOneof (UnaryOneofRequest) returns (SimpleResponse) {}
+  rpc UnaryEnum (UnaryEnumRequest) returns (SimpleResponse) {}
+
+  rpc ClientStreaming (stream SimpleRequest) returns (SimpleResponse) {}
+  rpc ServerStreaming (SimpleRequest) returns (stream SimpleResponse) {}
 }
 
-message UnaryRequest {
+message SimpleRequest {
   string name = 1;
 }
 
-message UnaryResponse {
+message SimpleResponse {
   string message = 1;
 }
 
