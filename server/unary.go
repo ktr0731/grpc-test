@@ -37,6 +37,20 @@ func (s *ExampleService) UnaryRepeatedMessage(ctx context.Context, req *api.Unar
 	}, nil
 }
 
+func (s *ExampleService) UnaryRepeatedEnum(ctx context.Context, req *api.UnaryRepeatedEnumRequest) (*api.SimpleResponse, error) {
+	var m, f int
+	for _, g := range req.GetGenders() {
+		if g == api.Gender_Male {
+			m++
+		} else {
+			f++
+		}
+	}
+	return &api.SimpleResponse{
+		Message: fmt.Sprintf("M: %d, F:%d", m, f),
+	}, nil
+}
+
 func (s *ExampleService) UnaryMap(ctx context.Context, req *api.UnaryMapRequest) (*api.SimpleResponse, error) {
 	var names []string
 	for k, v := range req.GetKvs() {
