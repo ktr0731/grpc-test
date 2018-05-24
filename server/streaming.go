@@ -16,6 +16,7 @@ func (s *ExampleService) ClientStreaming(stm api.Example_ClientStreamingServer) 
 	for {
 		req, err := stm.Recv()
 		if err == io.EOF {
+			log.Println("end of client streaming")
 			return stm.SendAndClose(&api.SimpleResponse{
 				Message: fmt.Sprintf(`%s, you greet %d times.`, name, t),
 			})
@@ -25,6 +26,7 @@ func (s *ExampleService) ClientStreaming(stm api.Example_ClientStreamingServer) 
 		}
 		name = req.GetName()
 		t++
+		log.Println("client streaming request received")
 	}
 	return nil
 }
@@ -42,4 +44,20 @@ func (s *ExampleService) ServerStreaming(req *api.SimpleRequest, stm api.Example
 		}
 	}
 	return nil
+}
+
+func (s *ExampleService) BidiStreaming(stm api.Example_BidiStreamingServer) error {
+	for {
+		req, err := stm.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		if err := s.ServerStreaming(req, stm); err != nil {
+			return err
+		}
+	}
 }
