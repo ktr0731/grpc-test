@@ -7,6 +7,7 @@ service Example {
   rpc UnaryMessage (UnaryMessageRequest) returns (SimpleResponse) {}
   rpc UnaryRepeated (UnaryRepeatedRequest) returns (SimpleResponse) {}
   rpc UnaryRepeatedMessage (UnaryRepeatedMessageRequest) returns (SimpleResponse) {}
+  rpc UnaryRepeatedEnum (UnaryRepeatedEnumRequest) returns (SimpleResponse) {}
   rpc UnaryMap (UnaryMapRequest) returns (SimpleResponse) {}
   rpc UnaryMapMessage (UnaryMapMessageRequest) returns (SimpleResponse) {}
   rpc UnaryOneof (UnaryOneofRequest) returns (SimpleResponse) {}
@@ -14,6 +15,7 @@ service Example {
 
   rpc ClientStreaming (stream SimpleRequest) returns (SimpleResponse) {}
   rpc ServerStreaming (SimpleRequest) returns (stream SimpleResponse) {}
+  rpc BidiStreaming(stream SimpleRequest) returns (stream SimpleResponse) {}
 }
 
 message SimpleRequest {
@@ -39,6 +41,10 @@ message UnaryRepeatedRequest {
 
 message UnaryRepeatedMessageRequest {
   repeated Name name = 1;
+}
+
+message UnaryRepeatedEnumRequest {
+  repeated Gender genders = 1;
 }
 
 message UnaryMapRequest {
