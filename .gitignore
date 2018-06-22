@@ -78,4 +78,6 @@ typings/
 # next.js build output
 .next
 
-
+client/web/js
+client/web/dist
+client/web/.cache

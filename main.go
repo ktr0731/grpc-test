@@ -1,18 +1,26 @@
 package main
 
 import (
+	"flag"
 	"net"
 
 	"github.com/ktr0731/grpc-test/server"
 )
 
 func main() {
-	l, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		panic(err)
+	web := flag.Bool("web", false, "works as a gRPC-Web server")
+	flag.Parse()
+
+	var l net.Listener
+	var err error
+	if !*web {
+		l, err = net.Listen("tcp", ":50051")
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	if err := server.New().Serve(l); err != nil {
+	if err := server.New().Serve(l, *web); err != nil {
 		panic(err)
 	}
 }
