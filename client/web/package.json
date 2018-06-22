@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "babel src --out-dir=js",
-    "proto": "protoc --plugin='protoc-gen-ts=./node_modules/.bin/protoc-gen-ts' --js_out='import_style=commonjs,binary:.' --proto_path ../../api ../../api/api.proto"
+    "proto": "protoc --plugin='protoc-gen-ts=./node_modules/.bin/protoc-gen-ts' --js_out='import_style=commonjs,binary:src' --proto_path ../../api ../../api/api.proto"
   },
   "dependencies": {
     "@types/google-protobuf": "^3.2.7",
@@ -14,8 +14,9 @@
     "ts-protoc-gen": "^0.7.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.51",
-    "@babel/core": "^7.0.0-beta.51",
-    "@babel/preset-env": "^7.0.0-beta.51"
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "parcel-bundler": "^1.9.2"
   }
 }
