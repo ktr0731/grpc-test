@@ -3,10 +3,18 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "build": "babel src --out-dir=js"
+  },
   "dependencies": {
     "@types/google-protobuf": "^3.2.7",
     "google-protobuf": "^3.5.0",
     "grpc-web-client": "^0.6.2",
     "ts-protoc-gen": "^0.7.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.51",
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51"
   }
 }
