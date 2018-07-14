@@ -20,7 +20,8 @@ func main() {
 		}
 	}
 
-	if err := server.New().Serve(l, *web); err != nil {
-		panic(err)
+	defer server.New().Serve(l, *web).Stop()
+	for {
+		// do nothing
 	}
 }

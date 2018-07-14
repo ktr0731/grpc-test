@@ -8,6 +8,7 @@ service Example {
   rpc UnaryRepeated (UnaryRepeatedRequest) returns (SimpleResponse) {}
   rpc UnaryRepeatedMessage (UnaryRepeatedMessageRequest) returns (SimpleResponse) {}
   rpc UnaryRepeatedEnum (UnaryRepeatedEnumRequest) returns (SimpleResponse) {}
+  rpc UnarySelf (UnarySelfRequest) returns (SimpleResponse) {}
   rpc UnaryMap (UnaryMapRequest) returns (SimpleResponse) {}
   rpc UnaryMapMessage (UnaryMapMessageRequest) returns (SimpleResponse) {}
   rpc UnaryOneof (UnaryOneofRequest) returns (SimpleResponse) {}
@@ -20,6 +21,7 @@ service Example {
 
 message SimpleRequest {
   string name = 1;
+  int32 age = 2;
 }
 
 message SimpleResponse {
@@ -45,6 +47,16 @@ message UnaryRepeatedMessageRequest {
 
 message UnaryRepeatedEnumRequest {
   repeated Gender genders = 1;
+}
+
+message UnarySelfRequest {
+  Person you = 1;
+}
+
+message Person {
+  Name name = 1;
+  string nickname = 2;
+  Person neighbor = 3;
 }
 
 message UnaryMapRequest {

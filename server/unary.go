@@ -51,6 +51,21 @@ func (s *ExampleService) UnaryRepeatedEnum(ctx context.Context, req *api.UnaryRe
 	}, nil
 }
 
+func (s *ExampleService) UnarySelf(ctx context.Context, req *api.UnarySelfRequest) (*api.SimpleResponse, error) {
+	person := req.GetYou()
+	var txt string
+	for {
+		txt += fmt.Sprintf("%s %s (%s) - ", person.GetName().GetFirstName(), person.GetName().GetLastName(), person.GetNickname())
+		person = person.GetNeighbor()
+		if person == nil {
+			break
+		}
+	}
+	return &api.SimpleResponse{
+		Message: txt,
+	}, nil
+}
+
 func (s *ExampleService) UnaryMap(ctx context.Context, req *api.UnaryMapRequest) (*api.SimpleResponse, error) {
 	var names []string
 	for k, v := range req.GetKvs() {

@@ -3,7 +3,8 @@ import { SimpleRequest } from './api_pb.js';
 import { Example } from './api_pb_service.js';
 
 const req = new SimpleRequest();
-req.setName("ktr");
+req.setName("tooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong-teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeext");
+// req.setName("ktr");
 grpc.unary(Example.Unary, {
     request: req,
     host: "http://localhost:50051",
