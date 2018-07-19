@@ -21,7 +21,6 @@ service Example {
 
 message SimpleRequest {
   string name = 1;
-  int32 age = 2;
 }
 
 message SimpleResponse {
