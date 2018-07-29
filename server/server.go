@@ -9,6 +9,7 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/ktr0731/grpc-test/api"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type Server struct {
@@ -18,9 +19,14 @@ type Server struct {
 	ws *http.Server
 }
 
-func New() *Server {
+func New(useReflection bool) *Server {
 	s := grpc.NewServer()
 	api.RegisterExampleServer(s, &ExampleService{})
+
+	if useReflection {
+		reflection.Register(s)
+		log.Println("gRPC reflection enabled")
+	}
 
 	return &Server{
 		s: s,

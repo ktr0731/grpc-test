@@ -59,7 +59,7 @@ message Person {
 }
 
 message UnaryMapRequest {
-  map<string, string> kvs = 1;
+  map<string, Person> kvs = 1;
 }
 
 message UnaryMapMessageRequest {

@@ -9,6 +9,7 @@ import (
 
 func main() {
 	web := flag.Bool("web", false, "works as a gRPC-Web server")
+	reflection := flag.Bool("r", false, "use gRPC reflection")
 	flag.Parse()
 
 	var l net.Listener
@@ -20,7 +21,7 @@ func main() {
 		}
 	}
 
-	defer server.New().Serve(l, *web).Stop()
+	defer server.New(*reflection).Serve(l, *web).Stop()
 	for {
 		// do nothing
 	}
