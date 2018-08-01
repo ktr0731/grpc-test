@@ -10,6 +10,10 @@ import (
 	"github.com/ktr0731/grpc-test/api"
 )
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 func (s *ExampleService) ClientStreaming(stm api.Example_ClientStreamingServer) error {
 	var t int
 	var name string
@@ -33,6 +37,7 @@ func (s *ExampleService) ClientStreaming(stm api.Example_ClientStreamingServer) 
 
 func (s *ExampleService) ServerStreaming(req *api.SimpleRequest, stm api.Example_ServerStreamingServer) error {
 	n := rand.Intn(10)
+	log.Printf("send %d times\n", n)
 	for i := 0; i < n; i++ {
 		log.Printf("send %d\n", i+1)
 		err := stm.Send(&api.SimpleResponse{
@@ -43,6 +48,7 @@ func (s *ExampleService) ServerStreaming(req *api.SimpleRequest, stm api.Example
 			return err
 		}
 	}
+	fmt.Println("END")
 	return nil
 }
 
