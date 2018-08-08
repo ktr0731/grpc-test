@@ -24,6 +24,7 @@ func main() {
 	client := api.NewExampleClient(conn)
 	if *server {
 		req := &api.SimpleRequest{"ktr"}
+		client.Unary()
 		stream, err := client.ServerStreaming(context.Background(), req)
 		panicIfErr(err)
 		for {

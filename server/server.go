@@ -35,7 +35,10 @@ func New(useReflection bool) *Server {
 
 func (s *Server) Serve(l net.Listener, web bool) *Server {
 	if web {
-		ws := grpcweb.WrapServer(s.s, grpcweb.WithWebsockets(false))
+		ws := grpcweb.WrapServer(s.s,
+			grpcweb.WithWebsockets(true),
+			grpcweb.WithWebsocketOriginFunc(func(req *http.Request) bool { return true }),
+			grpcweb.WithCorsForRegisteredEndpointsOnly(false))
 		mux := http.NewServeMux()
 		mux.Handle("/", ws)
 		s.ws = &http.Server{

@@ -36,7 +36,7 @@ func (s *ExampleService) ClientStreaming(stm api.Example_ClientStreamingServer) 
 }
 
 func (s *ExampleService) ServerStreaming(req *api.SimpleRequest, stm api.Example_ServerStreamingServer) error {
-	n := rand.Intn(10)
+	n := rand.Intn(5)
 	log.Printf("send %d times\n", n)
 	for i := 0; i < n; i++ {
 		log.Printf("send %d\n", i+1)
