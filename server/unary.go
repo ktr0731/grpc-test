@@ -111,3 +111,10 @@ func (s *ExampleService) UnaryEnum(ctx context.Context, req *api.UnaryEnumReques
 		Message: msg,
 	}, nil
 }
+
+func (s *ExampleService) UnaryBytes(ctx context.Context, req *api.UnaryBytesRequest) (*api.SimpleResponse, error) {
+	data := req.GetData()
+	return &api.SimpleResponse{
+		Message: fmt.Sprintf("received: (bytes) % x, (string) %s", data, data),
+	}, nil
+}

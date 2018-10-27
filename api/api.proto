@@ -13,6 +13,7 @@ service Example {
   rpc UnaryMapMessage (UnaryMapMessageRequest) returns (SimpleResponse) {}
   rpc UnaryOneof (UnaryOneofRequest) returns (SimpleResponse) {}
   rpc UnaryEnum (UnaryEnumRequest) returns (SimpleResponse) {}
+  rpc UnaryBytes (UnaryBytesRequest) returns (SimpleResponse) {}
 
   rpc ClientStreaming (stream SimpleRequest) returns (SimpleResponse) {}
   rpc ServerStreaming (SimpleRequest) returns (stream SimpleResponse) {}
@@ -80,4 +81,8 @@ enum Gender {
 
 message UnaryEnumRequest {
   Gender gender = 1;
+}
+
+message UnaryBytesRequest {
+  bytes data = 1;
 }
