@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/ktr0731/grpc-test/api"
@@ -67,12 +68,12 @@ func (s *ExampleService) UnarySelf(ctx context.Context, req *api.UnarySelfReques
 }
 
 func (s *ExampleService) UnaryMap(ctx context.Context, req *api.UnaryMapRequest) (*api.SimpleResponse, error) {
-	var names []string
+	var kvs []string
 	for k, v := range req.GetKvs() {
-		names = append(names, fmt.Sprintf("%s (nickname: %s)", v, k))
+		kvs = append(kvs, fmt.Sprintf("key = %s, value = %s", k, v))
 	}
 	return &api.SimpleResponse{
-		Message: fmt.Sprintf("hello, %s", strings.Join(names, ", ")),
+		Message: fmt.Sprintf("passed kvs: %s", strings.Join(kvs, ", ")),
 	}, nil
 }
 
@@ -114,7 +115,9 @@ func (s *ExampleService) UnaryEnum(ctx context.Context, req *api.UnaryEnumReques
 
 func (s *ExampleService) UnaryBytes(ctx context.Context, req *api.UnaryBytesRequest) (*api.SimpleResponse, error) {
 	data := req.GetData()
+	msg := fmt.Sprintf("received: (bytes) % x, (string) %s", data, data)
+	log.Println(msg)
 	return &api.SimpleResponse{
-		Message: fmt.Sprintf("received: (bytes) % x, (string) %s", data, data),
+		Message: msg,
 	}, nil
 }
