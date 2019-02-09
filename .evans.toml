@@ -1,0 +1,4 @@
+[default]
+protoFile = ["api/api.proto"]
+package = "api"
+service = "Example"

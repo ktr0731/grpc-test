@@ -36,6 +36,7 @@ func (s *ExampleService) ClientStreaming(stm api.Example_ClientStreamingServer) 
 }
 
 func (s *ExampleService) ServerStreaming(req *api.SimpleRequest, stm api.Example_ServerStreamingServer) error {
+	defer log.Println("end of server streaming")
 	n := rand.Intn(5)
 	log.Printf("send %d times\n", n)
 	for i := 0; i < n; i++ {
@@ -43,12 +44,11 @@ func (s *ExampleService) ServerStreaming(req *api.SimpleRequest, stm api.Example
 		err := stm.Send(&api.SimpleResponse{
 			Message: fmt.Sprintf(`hello %s, I greet %d times.`, req.GetName(), i),
 		})
-		time.Sleep(1 * time.Second)
+		time.Sleep(waitTime)
 		if err != nil {
 			return err
 		}
 	}
-	fmt.Println("END")
 	return nil
 }
 

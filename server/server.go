@@ -2,9 +2,13 @@ package server
 
 import (
 	"context"
+	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/ktr0731/grpc-test/api"
@@ -12,24 +16,46 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+var (
+	waitTime = 1 * time.Second
+)
+
+func SetWaitTime(t time.Duration) {
+	waitTime = t
+}
+
 type Server struct {
 	startAsWeb bool
 
-	s  *grpc.Server
-	ws *http.Server
+	logger *log.Logger
+
+	sCloseCh <-chan error
+	s        *grpc.Server
+
+	wsCloseCh <-chan error
+	ws        *http.Server
 }
 
-func New(useReflection bool) *Server {
+func New(verbose, useReflection bool) *Server {
 	s := grpc.NewServer()
 	api.RegisterExampleServer(s, &ExampleService{})
 
+	var logWriter io.Writer
+	if verbose {
+		logWriter = os.Stderr
+	} else {
+		logWriter = ioutil.Discard
+	}
+	logger := log.New(logWriter, "[grpc-test] ", log.LstdFlags)
+
 	if useReflection {
 		reflection.Register(s)
-		log.Println("gRPC reflection enabled")
+		logger.Println("gRPC reflection enabled")
 	}
 
 	return &Server{
-		s: s,
+		s:      s,
+		logger: logger,
 	}
 }
 
@@ -47,31 +73,48 @@ func (s *Server) Serve(l net.Listener, web bool) *Server {
 		}
 		s.startAsWeb = true
 
-		log.Println("works as a gRPC Web server")
+		s.logger.Println("works as a gRPC Web server")
+		closeCh := make(chan error)
+		s.sCloseCh = closeCh
 		go func() {
-			if err := s.ws.ListenAndServe(); err != nil {
-				log.Println(err)
-			}
+			closeCh <- s.ws.ListenAndServe()
 		}()
 
 		return s
 	}
 
-	log.Println("works as a gRPC server")
+	s.logger.Println("works as a gRPC server")
+	closeCh := make(chan error)
+	s.wsCloseCh = closeCh
 	go func() {
-		if err := s.s.Serve(l); err != nil {
-			log.Println(err)
-		}
+		closeCh <- s.s.Serve(l)
 	}()
+
 	return s
 }
 
 func (s *Server) Stop() error {
+	// Receive the error if s.Serve has an error.
+	select {
+	case err := <-s.sCloseCh:
+		return err
+	case err := <-s.wsCloseCh:
+		return err
+	default:
+		// no errors
+	}
+
 	if s.startAsWeb {
 		return s.ws.Shutdown(context.Background())
 	}
 	s.s.GracefulStop()
-	return nil
+
+	select {
+	case err := <-s.sCloseCh:
+		return err
+	case err := <-s.wsCloseCh:
+		return err
+	}
 }
 
 type ExampleService struct {
