@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"net"
 	"os"
@@ -10,16 +9,18 @@ import (
 
 	"github.com/ktr0731/grpc-test/server"
 	"github.com/pkg/profile"
+	"github.com/spf13/pflag"
 )
 
 func main() {
 	defer profile.Start().Stop()
 
-	web := flag.Bool("web", false, "works as a gRPC-Web server")
-	reflection := flag.Bool("r", false, "use gRPC reflection")
-	verbose := flag.Bool("v", true, "verbose")
-	waitTime := flag.Duration("wait", 1*time.Second, "wait time for each server streaming response")
-	flag.Parse()
+	web := pflag.Bool("web", false, "works as a gRPC-Web server")
+	reflection := pflag.BoolP("reflection", "r", false, "use gRPC reflection")
+	verbose := pflag.Bool("v", true, "verbose")
+	waitTime := pflag.Duration("wait", 1*time.Second, "wait time for each server streaming response")
+	tls := pflag.BoolP("tls", "t", false, "use TLS")
+	pflag.Parse()
 
 	var l net.Listener
 	var err error
@@ -31,7 +32,7 @@ func main() {
 	}
 
 	server.SetWaitTime(*waitTime)
-	defer server.New(*verbose, *reflection).Serve(l, *web).Stop()
+	defer server.New(*verbose, *reflection, *tls).Serve(l, *web).Stop()
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)

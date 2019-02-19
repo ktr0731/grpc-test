@@ -8,11 +8,13 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/ktr0731/grpc-test/api"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -36,10 +38,7 @@ type Server struct {
 	ws        *http.Server
 }
 
-func New(verbose, useReflection bool) *Server {
-	s := grpc.NewServer()
-	api.RegisterExampleServer(s, &ExampleService{})
-
+func New(verbose, useReflection, useTLS bool) *Server {
 	var logWriter io.Writer
 	if verbose {
 		logWriter = os.Stderr
@@ -47,6 +46,18 @@ func New(verbose, useReflection bool) *Server {
 		logWriter = ioutil.Discard
 	}
 	logger := log.New(logWriter, "[grpc-test] ", log.LstdFlags)
+
+	var opts []grpc.ServerOption
+	if useTLS {
+		creds, err := credentials.NewServerTLSFromFile(filepath.Join("cert", "localhost.pem"), filepath.Join("cert", "localhost-key.pem"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts = append(opts, grpc.Creds(creds))
+		logger.Println("TLS enabled")
+	}
+	s := grpc.NewServer(opts...)
+	api.RegisterExampleServer(s, &ExampleService{})
 
 	if useReflection {
 		reflection.Register(s)
