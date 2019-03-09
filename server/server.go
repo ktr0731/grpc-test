@@ -51,7 +51,7 @@ func New(verbose, useReflection, useTLS bool) *Server {
 	} else {
 		logWriter = ioutil.Discard
 	}
-	logger := log.New(logWriter, "[grpc-test] ", log.LstdFlags|log.Lshortfile)
+	logger := log.New(logWriter, "grpc-test: ", log.LstdFlags|log.Lshortfile)
 
 	var opts []grpc.ServerOption
 	if useTLS {
