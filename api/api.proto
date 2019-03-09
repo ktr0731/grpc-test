@@ -56,7 +56,7 @@ message UnarySelfRequest {
 message Person {
   Name name = 1;
   string nickname = 2;
-  Person neighbor = 3;
+  repeated Person friends = 3;
 }
 
 message UnaryMapRequest {

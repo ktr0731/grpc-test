@@ -53,17 +53,22 @@ func (s *ExampleService) UnaryRepeatedEnum(ctx context.Context, req *api.UnaryRe
 }
 
 func (s *ExampleService) UnarySelf(ctx context.Context, req *api.UnarySelfRequest) (*api.SimpleResponse, error) {
-	person := req.GetYou()
-	var txt string
-	for {
-		txt += fmt.Sprintf("%s %s (%s) - ", person.GetName().GetFirstName(), person.GetName().GetLastName(), person.GetNickname())
-		person = person.GetNeighbor()
-		if person == nil {
-			break
+	var processPerson func(*api.Person) string
+	processPerson = func(p *api.Person) string {
+		txt := fmt.Sprintf("%s %s (%s), friends: ", p.GetName().GetFirstName(), p.GetName().GetLastName(), p.GetNickname())
+		friends := p.GetFriends()
+		names := make([]string, len(friends))
+		for i, friend := range friends {
+			names[i] = friend.GetNickname()
 		}
+		txt += strings.Join(names, ", ") + "\n"
+		for _, friend := range friends {
+			txt += processPerson(friend)
+		}
+		return txt
 	}
 	return &api.SimpleResponse{
-		Message: txt,
+		Message: processPerson(req.GetYou()),
 	}, nil
 }
 
