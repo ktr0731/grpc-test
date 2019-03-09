@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/ktr0731/grpc-test/api"
@@ -16,19 +17,19 @@ func init() {
 
 func (s *ExampleService) ClientStreaming(stm api.Example_ClientStreamingServer) error {
 	var t int
-	var name string
+	var names []string
 	for {
 		req, err := stm.Recv()
 		if err == io.EOF {
 			log.Println("end of client streaming")
 			return stm.SendAndClose(&api.SimpleResponse{
-				Message: fmt.Sprintf(`%s, you greet %d times.`, name, t),
+				Message: fmt.Sprintf(`you sent requests %d times (%s).`, t, strings.Join(names, ", ")),
 			})
 		}
 		if err != nil {
 			return err
 		}
-		name = req.GetName()
+		names = append(names, req.GetName())
 		t++
 		log.Println("client streaming request received")
 	}
