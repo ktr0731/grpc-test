@@ -2,20 +2,24 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"io"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/ktr0731/dept/logger"
 	"github.com/ktr0731/grpc-test/api"
+	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
+
+	_ "github.com/ktr0731/grpc-test/statik"
 )
 
 var (
@@ -36,6 +40,8 @@ type Server struct {
 
 	wsCloseCh <-chan error
 	ws        *http.Server
+
+	useTLS bool
 }
 
 func New(verbose, useReflection, useTLS bool) *Server {
@@ -45,14 +51,12 @@ func New(verbose, useReflection, useTLS bool) *Server {
 	} else {
 		logWriter = ioutil.Discard
 	}
-	logger := log.New(logWriter, "[grpc-test] ", log.LstdFlags)
+	logger := log.New(logWriter, "[grpc-test] ", log.LstdFlags|log.Lshortfile)
 
 	var opts []grpc.ServerOption
 	if useTLS {
-		creds, err := credentials.NewServerTLSFromFile(filepath.Join("cert", "localhost.pem"), filepath.Join("cert", "localhost-key.pem"))
-		if err != nil {
-			log.Fatal(err)
-		}
+		tlsCfg := newTLSConfig()
+		creds := credentials.NewTLS(tlsCfg)
 		opts = append(opts, grpc.Creds(creds))
 		logger.Println("TLS enabled")
 	}
@@ -67,6 +71,7 @@ func New(verbose, useReflection, useTLS bool) *Server {
 	return &Server{
 		s:      s,
 		logger: logger,
+		useTLS: useTLS,
 	}
 }
 
@@ -88,7 +93,12 @@ func (s *Server) Serve(l net.Listener, web bool) *Server {
 		closeCh := make(chan error)
 		s.sCloseCh = closeCh
 		go func() {
-			closeCh <- s.ws.ListenAndServe()
+			if s.useTLS {
+				s.ws.TLSConfig = newTLSConfig()
+				closeCh <- s.ws.ListenAndServeTLS("", "")
+			} else {
+				closeCh <- s.ws.ListenAndServe()
+			}
 		}()
 
 		return s
@@ -130,4 +140,33 @@ func (s *Server) Stop() error {
 
 type ExampleService struct {
 	api.ExampleServer
+}
+
+func newTLSConfig() *tls.Config {
+	statikFS, err := fs.New()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	certPEM, err := statikFS.Open("/localhost.pem")
+	if err != nil {
+		logger.Fatal(err)
+	}
+	keyPEM, err := statikFS.Open("/localhost-key.pem")
+	if err != nil {
+		logger.Fatal(err)
+	}
+	certPEMBytes, err := ioutil.ReadAll(certPEM)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	keyPEMBytes, err := ioutil.ReadAll(keyPEM)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	cert, err := tls.X509KeyPair(certPEMBytes, keyPEMBytes)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	return &tls.Config{Certificates: []tls.Certificate{cert}}
 }
