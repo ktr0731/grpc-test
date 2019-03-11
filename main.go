@@ -2,37 +2,35 @@ package main
 
 import (
 	"log"
-	"net"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/ktr0731/grpc-test/server"
-	"github.com/pkg/profile"
 	"github.com/spf13/pflag"
 )
 
 func main() {
-	defer profile.Start().Stop()
-
 	web := pflag.Bool("web", false, "works as a gRPC-Web server")
 	reflection := pflag.BoolP("reflection", "r", false, "use gRPC reflection")
-	verbose := pflag.Bool("v", true, "verbose")
-	waitTime := pflag.Duration("wait", 1*time.Second, "wait time for each server streaming response")
+	verbose := pflag.BoolP("verbose", "v", true, "verbose")
 	tls := pflag.BoolP("tls", "t", false, "use TLS")
 	pflag.Parse()
 
-	var l net.Listener
-	var err error
-	if !*web {
-		l, err = net.Listen("tcp", ":50051")
-		if err != nil {
-			panic(err)
-		}
+	var opts []server.Option
+	if *verbose {
+		opts = append(opts, server.WithVerbose())
+	}
+	if *reflection {
+		opts = append(opts, server.WithReflection())
+	}
+	if *tls {
+		opts = append(opts, server.WithTLS())
+	}
+	if *web {
+		opts = append(opts, server.WithProtocol(server.ProtocolImprobableGRPCWeb))
 	}
 
-	server.SetWaitTime(*waitTime)
-	defer server.New(*verbose, *reflection, *tls).Serve(l, *web).Stop()
+	defer server.New(opts...).Serve().Stop()
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)

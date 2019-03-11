@@ -61,7 +61,7 @@ func (s *ExampleService) UnarySelf(ctx context.Context, req *api.UnarySelfReques
 		for i, friend := range friends {
 			names[i] = friend.GetNickname()
 		}
-		txt += strings.Join(names, ", ") + "\n"
+		txt += strings.Join(names, ", ") + " → "
 		for _, friend := range friends {
 			txt += processPerson(friend)
 		}

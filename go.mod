@@ -6,6 +6,7 @@ require (
 	github.com/improbable-eng/grpc-web v0.0.0-20181128220516-1c63d72d1d2f
 	github.com/ktr0731/dept v0.1.1
 	github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223 // indirect
+	github.com/pkg/errors v0.8.0
 	github.com/pkg/profile v1.2.1
 	github.com/rakyll/statik v0.1.5
 	github.com/rs/cors v1.6.0 // indirect

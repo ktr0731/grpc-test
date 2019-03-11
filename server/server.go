@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -22,17 +23,7 @@ import (
 	_ "github.com/ktr0731/grpc-test/statik"
 )
 
-var (
-	waitTime = 1 * time.Second
-)
-
-func SetWaitTime(t time.Duration) {
-	waitTime = t
-}
-
 type Server struct {
-	startAsWeb bool
-
 	logger *log.Logger
 
 	sCloseCh <-chan error
@@ -41,29 +32,28 @@ type Server struct {
 	wsCloseCh <-chan error
 	ws        *http.Server
 
-	useTLS bool
+	opts *opt
 }
 
-func New(verbose, useReflection, useTLS bool) *Server {
-	var logWriter io.Writer
-	if verbose {
-		logWriter = os.Stderr
-	} else {
-		logWriter = ioutil.Discard
+func New(opts ...Option) *Server {
+	opt := defaultOption
+	for _, o := range opts {
+		o(&opt)
 	}
-	logger := log.New(logWriter, "grpc-test: ", log.LstdFlags|log.Lshortfile)
 
-	var opts []grpc.ServerOption
-	if useTLS {
+	logger := newLogger(&opt)
+
+	var grpcOpts []grpc.ServerOption
+	if opt.tls {
 		tlsCfg := newTLSConfig()
 		creds := credentials.NewTLS(tlsCfg)
-		opts = append(opts, grpc.Creds(creds))
+		grpcOpts = append(grpcOpts, grpc.Creds(creds))
 		logger.Println("TLS enabled")
 	}
-	s := grpc.NewServer(opts...)
+	s := grpc.NewServer(grpcOpts...)
 	api.RegisterExampleServer(s, &ExampleService{})
 
-	if useReflection {
+	if opt.reflection {
 		reflection.Register(s)
 		logger.Println("gRPC reflection enabled")
 	}
@@ -71,12 +61,14 @@ func New(verbose, useReflection, useTLS bool) *Server {
 	return &Server{
 		s:      s,
 		logger: logger,
-		useTLS: useTLS,
+		opts:   &opt,
 	}
 }
 
-func (s *Server) Serve(l net.Listener, web bool) *Server {
-	if web {
+func (s *Server) Serve() *Server {
+	addr := fmt.Sprintf("%s:%s", s.opts.host, s.opts.port)
+
+	if isGRPCWeb(s.opts.protocol) {
 		ws := grpcweb.WrapServer(s.s,
 			grpcweb.WithWebsockets(true),
 			grpcweb.WithWebsocketOriginFunc(func(req *http.Request) bool { return true }),
@@ -84,18 +76,17 @@ func (s *Server) Serve(l net.Listener, web bool) *Server {
 		mux := http.NewServeMux()
 		mux.Handle("/", ws)
 		s.ws = &http.Server{
-			Addr:    ":50051",
+			Addr:    addr,
 			Handler: mux,
 		}
-		s.startAsWeb = true
 
-		s.logger.Println("works as a gRPC Web server")
+		s.logger.Println("works as a gRPC-Web server")
 		closeCh := make(chan error)
 		s.sCloseCh = closeCh
 		go func() {
-			if s.useTLS {
-				s.ws.TLSConfig = newTLSConfig()
-				closeCh <- s.ws.ListenAndServeTLS("", "")
+			s.logger.Printf("listen at %s", addr)
+			if s.opts.tls {
+				panic("TODO: gRPC-Web + TLS is not supported yet")
 			} else {
 				closeCh <- s.ws.ListenAndServe()
 			}
@@ -104,7 +95,12 @@ func (s *Server) Serve(l net.Listener, web bool) *Server {
 		return s
 	}
 
+	l, err := net.Listen("tcp", addr)
+	if err != nil {
+		s.logger.Fatalf("failed to listen a tcp port for gRPC conn: %s", err)
+	}
 	s.logger.Println("works as a gRPC server")
+	s.logger.Printf("listen at %s", addr)
 	closeCh := make(chan error)
 	s.wsCloseCh = closeCh
 	go func() {
@@ -125,10 +121,20 @@ func (s *Server) Stop() error {
 		// no errors
 	}
 
-	if s.startAsWeb {
+	if isGRPCWeb(s.opts.protocol) {
 		return s.ws.Shutdown(context.Background())
 	}
-	s.s.GracefulStop()
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		s.s.GracefulStop()
+	}()
+	select {
+	case <-done:
+	case <-time.After(3 * time.Second):
+		s.logger.Println("graceful stop deadline exceeded. use Stop instead of GracefulStop.")
+		s.s.Stop()
+	}
 
 	select {
 	case err := <-s.sCloseCh:
@@ -169,4 +175,18 @@ func newTLSConfig() *tls.Config {
 		logger.Fatal(err)
 	}
 	return &tls.Config{Certificates: []tls.Certificate{cert}}
+}
+
+func newLogger(opt *opt) *log.Logger {
+	var logWriter io.Writer
+	if opt.verbose {
+		logWriter = os.Stderr
+	} else {
+		logWriter = ioutil.Discard
+	}
+	return log.New(logWriter, "grpc-test: ", log.LstdFlags|log.Lshortfile)
+}
+
+func isGRPCWeb(p Protocol) bool {
+	return p == ProtocolImprobableGRPCWeb
 }
