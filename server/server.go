@@ -25,11 +25,9 @@ import (
 type Server struct {
 	logger *log.Logger
 
-	sCloseCh <-chan error
-	s        *grpc.Server
+	s *grpc.Server
 
-	wsCloseCh <-chan error
-	ws        *http.Server
+	ws *http.Server
 
 	opts *opt
 }
@@ -78,14 +76,12 @@ func (s *Server) Serve() *Server {
 		}
 
 		s.logger.Println("works as a gRPC-Web server")
-		closeCh := make(chan error)
-		s.sCloseCh = closeCh
 		go func() {
 			s.logger.Printf("listen at %s", s.opts.addr)
 			if s.opts.tls {
 				panic("TODO: gRPC-Web + TLS is not supported yet")
 			} else {
-				closeCh <- s.ws.ListenAndServe()
+				s.ws.ListenAndServe()
 			}
 		}()
 
@@ -98,29 +94,24 @@ func (s *Server) Serve() *Server {
 	}
 	s.logger.Println("works as a gRPC server")
 	s.logger.Printf("listen at %s", s.opts.addr)
-	closeCh := make(chan error)
-	s.wsCloseCh = closeCh
 	go func() {
-		closeCh <- s.s.Serve(l)
+		s.s.Serve(l)
 	}()
 
 	return s
 }
 
 func (s *Server) Stop() error {
-	// Receive the error if s.Serve has an error.
-	select {
-	case err := <-s.sCloseCh:
-		return err
-	case err := <-s.wsCloseCh:
-		return err
-	default:
-		// no errors
+	if isGRPCWeb(s.opts.protocol) {
+		s.logger.Println("trying to shutdown the server")
+		if err := s.ws.Shutdown(context.Background()); err != nil {
+			return err
+		}
+		s.logger.Println("shutdown succeeded")
+		return nil
 	}
 
-	if isGRPCWeb(s.opts.protocol) {
-		return s.ws.Shutdown(context.Background())
-	}
+	s.logger.Println("trying to graceful shutdown the server")
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
@@ -128,17 +119,13 @@ func (s *Server) Stop() error {
 	}()
 	select {
 	case <-done:
+		s.logger.Println("graceful shutdown succeeded")
 	case <-time.After(3 * time.Second):
 		s.logger.Println("graceful stop deadline exceeded. use Stop instead of GracefulStop.")
 		s.s.Stop()
 	}
 
-	select {
-	case err := <-s.sCloseCh:
-		return err
-	case err := <-s.wsCloseCh:
-		return err
-	}
+	return nil
 }
 
 type ExampleService struct {

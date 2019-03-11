@@ -11,8 +11,17 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer(t *testing.T) {
-	err := New().Serve().Stop()
-	if err != nil {
-		t.Errorf("Stop must not return an error, but got '%s'", err)
-	}
+	t.Run("normal", func(t *testing.T) {
+		err := New(WithVerbose()).Serve().Stop()
+		if err != nil {
+			t.Errorf("Stop must not return an error, but got '%s'", err)
+		}
+	})
+
+	t.Run("web", func(t *testing.T) {
+		err := New(WithVerbose(), WithProtocol(ProtocolImprobableGRPCWeb)).Serve().Stop()
+		if err != nil {
+			t.Errorf("Stop must not return an error, but got '%s'", err)
+		}
+	})
 }
