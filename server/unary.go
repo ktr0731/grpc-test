@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/ktr0731/grpc-test/api"
@@ -121,7 +120,7 @@ func (s *ExampleService) UnaryEnum(ctx context.Context, req *api.UnaryEnumReques
 func (s *ExampleService) UnaryBytes(ctx context.Context, req *api.UnaryBytesRequest) (*api.SimpleResponse, error) {
 	data := req.GetData()
 	msg := fmt.Sprintf("received: (bytes) % x, (string) %s", data, data)
-	log.Println(msg)
+	s.logger.Println(msg)
 	return &api.SimpleResponse{
 		Message: msg,
 	}, nil

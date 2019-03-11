@@ -51,7 +51,7 @@ func New(opts ...Option) *Server {
 		logger.Println("TLS enabled")
 	}
 	s := grpc.NewServer(grpcOpts...)
-	api.RegisterExampleServer(s, &ExampleService{})
+	api.RegisterExampleServer(s, &ExampleService{logger: logger})
 
 	if opt.reflection {
 		reflection.Register(s)
@@ -145,6 +145,7 @@ func (s *Server) Stop() error {
 }
 
 type ExampleService struct {
+	logger *log.Logger
 	api.ExampleServer
 }
 
