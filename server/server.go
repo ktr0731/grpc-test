@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -66,8 +65,6 @@ func New(opts ...Option) *Server {
 }
 
 func (s *Server) Serve() *Server {
-	addr := fmt.Sprintf("%s:%s", s.opts.host, s.opts.port)
-
 	if isGRPCWeb(s.opts.protocol) {
 		ws := grpcweb.WrapServer(s.s,
 			grpcweb.WithWebsockets(true),
@@ -76,7 +73,7 @@ func (s *Server) Serve() *Server {
 		mux := http.NewServeMux()
 		mux.Handle("/", ws)
 		s.ws = &http.Server{
-			Addr:    addr,
+			Addr:    s.opts.addr,
 			Handler: mux,
 		}
 
@@ -84,7 +81,7 @@ func (s *Server) Serve() *Server {
 		closeCh := make(chan error)
 		s.sCloseCh = closeCh
 		go func() {
-			s.logger.Printf("listen at %s", addr)
+			s.logger.Printf("listen at %s", s.opts.addr)
 			if s.opts.tls {
 				panic("TODO: gRPC-Web + TLS is not supported yet")
 			} else {
@@ -95,12 +92,12 @@ func (s *Server) Serve() *Server {
 		return s
 	}
 
-	l, err := net.Listen("tcp", addr)
+	l, err := net.Listen("tcp", s.opts.addr)
 	if err != nil {
 		s.logger.Fatalf("failed to listen a tcp port for gRPC conn: %s", err)
 	}
 	s.logger.Println("works as a gRPC server")
-	s.logger.Printf("listen at %s", addr)
+	s.logger.Printf("listen at %s", s.opts.addr)
 	closeCh := make(chan error)
 	s.wsCloseCh = closeCh
 	go func() {

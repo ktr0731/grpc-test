@@ -6,8 +6,7 @@ import (
 
 type opt struct {
 	protocol Protocol
-	host     string
-	port     string
+	addr     string
 
 	tls        bool
 	reflection bool
@@ -17,7 +16,7 @@ type opt struct {
 type Option func(*opt)
 
 var defaultOption = opt{
-	port: "50051",
+	addr: ":50051",
 }
 
 type Protocol int
@@ -34,6 +33,12 @@ func WithProtocol(p Protocol) Option {
 	}
 	return func(o *opt) {
 		o.protocol = p
+	}
+}
+
+func WithAddr(addr string) Option {
+	return func(o *opt) {
+		o.addr = addr
 	}
 }
 
