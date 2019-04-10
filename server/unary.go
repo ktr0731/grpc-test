@@ -2,8 +2,11 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
+
+	"google.golang.org/grpc/metadata"
 
 	"github.com/ktr0731/grpc-test/api"
 )
@@ -121,6 +124,20 @@ func (s *ExampleService) UnaryBytes(ctx context.Context, req *api.UnaryBytesRequ
 	data := req.GetData()
 	msg := fmt.Sprintf("received: (bytes) % x, (string) %s", data, data)
 	s.logger.Println(msg)
+	return &api.SimpleResponse{
+		Message: msg,
+	}, nil
+}
+
+func (s *ExampleService) UnaryHeader(ctx context.Context, req *api.UnaryHeaderRequest) (*api.SimpleResponse, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, errors.New("cannot get headers")
+	}
+	var msg string
+	for k, v := range md {
+		msg += fmt.Sprintf("key = %s, val = %s\n", k, strings.Join(v, ", "))
+	}
 	return &api.SimpleResponse{
 		Message: msg,
 	}, nil

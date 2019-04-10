@@ -21,6 +21,8 @@ github.com/hashicorp/go-multierror v1.0.0/go.mod h1:dHtQlpGsu+cZNNAkkCN/P3hoUDHh
 github.com/hashicorp/go-version v1.0.0/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
 github.com/improbable-eng/grpc-web v0.0.0-20181128220516-1c63d72d1d2f h1:i9Bo2fIomncMW7ZwTvlBsdNXmSD49iJxO07l6xSDnbU=
 github.com/improbable-eng/grpc-web v0.0.0-20181128220516-1c63d72d1d2f/go.mod h1:6hRR09jOEG81ADP5wCQju1z71g6OL4eEvELdran/3cs=
+github.com/improbable-eng/grpc-web v0.9.1 h1:tenDg9Lg+zYXeS/ojbKyfwVO5TVYh5FFGsrXNAblF1o=
+github.com/improbable-eng/grpc-web v0.9.1/go.mod h1:6hRR09jOEG81ADP5wCQju1z71g6OL4eEvELdran/3cs=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/ktr0731/dept v0.1.1 h1:PcktL15pzgmRguVvU75LfJirKpqveX3lqLIiq61HJSc=
 github.com/ktr0731/dept v0.1.1/go.mod h1:RTx3aP/gE0/MNhYgOcxETTNBudO24Nbis4y4KImynVA=

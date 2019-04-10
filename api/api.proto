@@ -14,6 +14,7 @@ service Example {
   rpc UnaryOneof (UnaryOneofRequest) returns (SimpleResponse) {}
   rpc UnaryEnum (UnaryEnumRequest) returns (SimpleResponse) {}
   rpc UnaryBytes (UnaryBytesRequest) returns (SimpleResponse) {}
+  rpc UnaryHeader (UnaryHeaderRequest) returns (SimpleResponse) {}
 
   rpc ClientStreaming (stream SimpleRequest) returns (SimpleResponse) {}
   rpc ServerStreaming (SimpleRequest) returns (stream SimpleResponse) {}
@@ -86,3 +87,5 @@ message UnaryEnumRequest {
 message UnaryBytesRequest {
   bytes data = 1;
 }
+
+message UnaryHeaderRequest {}
