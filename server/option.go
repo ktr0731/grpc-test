@@ -8,9 +8,12 @@ type opt struct {
 	protocol Protocol
 	addr     string
 
-	tls        bool
-	reflection bool
-	verbose    bool
+	tls           bool
+	cert, certKey string
+	rootCACert    string
+	reflection    bool
+	verbose       bool
+	compressor    string
 }
 
 type Option func(*opt)
@@ -48,6 +51,19 @@ func WithTLS() Option {
 	}
 }
 
+func WithCert(cert, certKey string) Option {
+	return func(o *opt) {
+		o.cert = cert
+		o.certKey = certKey
+	}
+}
+
+func WithRootCACert(cert string) Option {
+	return func(o *opt) {
+		o.rootCACert = cert
+	}
+}
+
 func WithReflection() Option {
 	return func(o *opt) {
 		o.reflection = true
@@ -57,5 +73,11 @@ func WithReflection() Option {
 func WithVerbose() Option {
 	return func(o *opt) {
 		o.verbose = true
+	}
+}
+
+func WithCompressor(c string) Option {
+	return func(o *opt) {
+		o.compressor = c
 	}
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"io"
 	"io/ioutil"
 	"log"
@@ -42,11 +43,40 @@ func New(opts ...Option) *Server {
 
 	var grpcOpts []grpc.ServerOption
 	if opt.tls {
-		tlsCfg := newTLSConfig()
+		var tlsCfg *tls.Config
+		if opt.cert != "" {
+			certPEMBytes, err := ioutil.ReadFile(opt.cert)
+			if err != nil {
+				logger.Fatal(err)
+			}
+			keyPEMBytes, err := ioutil.ReadFile(opt.certKey)
+			if err != nil {
+				logger.Fatal(err)
+			}
+			cert, err := tls.X509KeyPair(certPEMBytes, keyPEMBytes)
+			if err != nil {
+				logger.Fatal(err)
+			}
+			tlsCfg = &tls.Config{Certificates: []tls.Certificate{cert}}
+		} else {
+			tlsCfg = newTLSConfig()
+		}
+		if opt.rootCACert != "" {
+			b, err := ioutil.ReadFile(opt.rootCACert)
+			if err != nil {
+				logger.Fatal(err)
+			}
+			cp := x509.NewCertPool()
+			if !cp.AppendCertsFromPEM(b) {
+				logger.Fatal(err)
+			}
+			tlsCfg.RootCAs = cp
+		}
 		creds := credentials.NewTLS(tlsCfg)
 		grpcOpts = append(grpcOpts, grpc.Creds(creds))
 		logger.Println("TLS enabled")
 	}
+
 	s := grpc.NewServer(grpcOpts...)
 	api.RegisterExampleServer(s, &ExampleService{logger: logger})
 

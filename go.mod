@@ -17,3 +17,5 @@ require (
 )
 
 replace github.com/ktr0731/grpc-test/statik v0.0.0 => ./statik
+
+go 1.13
