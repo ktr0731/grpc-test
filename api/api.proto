@@ -16,6 +16,8 @@ service Example {
   rpc UnaryBytes (UnaryBytesRequest) returns (SimpleResponse) {}
   rpc UnaryHeader (UnaryHeaderRequest) returns (SimpleResponse) {}
 
+  rpc UnaryWithMapResponse (SimpleRequest) returns (MapResponse) {}
+
   rpc ClientStreaming (stream SimpleRequest) returns (SimpleResponse) {}
   rpc ServerStreaming (SimpleRequest) returns (stream SimpleResponse) {}
   rpc BidiStreaming(stream SimpleRequest) returns (stream SimpleResponse) {}
@@ -89,3 +91,7 @@ message UnaryBytesRequest {
 }
 
 message UnaryHeaderRequest {}
+
+message MapResponse {
+  map<string, Name> names = 1;
+}

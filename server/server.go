@@ -10,7 +10,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/ktr0731/dept/logger"
@@ -18,6 +17,7 @@ import (
 	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 
 	_ "github.com/ktr0731/grpc-test/statik"
@@ -42,6 +42,7 @@ func New(opts ...Option) *Server {
 	logger := newLogger(&opt)
 
 	var grpcOpts []grpc.ServerOption
+	grpcOpts = append(grpcOpts, grpc.UnaryInterceptor(headerLoggingInterceptor(logger)))
 	if opt.tls {
 		var tlsCfg *tls.Config
 		if opt.cert != "" {
@@ -142,25 +143,24 @@ func (s *Server) Stop() error {
 	}
 
 	s.logger.Println("trying to graceful shutdown the server")
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-		s.s.GracefulStop()
-	}()
-	select {
-	case <-done:
-		s.logger.Println("graceful shutdown succeeded")
-	case <-time.After(3 * time.Second):
-		s.logger.Println("graceful stop deadline exceeded. use Stop instead of GracefulStop.")
-		s.s.Stop()
-	}
+	// done := make(chan struct{})
+	// go func() {
+	// 	defer close(done)
+	// 	s.s.GracefulStop()
+	// }()
+	// select {
+	// case <-done:
+	// 	s.logger.Println("graceful shutdown succeeded")
+	// case <-time.After(3 * time.Second):
+	s.logger.Println("graceful stop deadline exceeded. use Stop instead of GracefulStop.")
+	s.s.Stop()
+	// }
 
 	return nil
 }
 
 type ExampleService struct {
 	logger *log.Logger
-	api.ExampleServer
 }
 
 func newTLSConfig() *tls.Config {
@@ -204,4 +204,12 @@ func newLogger(opt *opt) *log.Logger {
 
 func isGRPCWeb(p Protocol) bool {
 	return p == ProtocolImprobableGRPCWeb
+}
+
+func headerLoggingInterceptor(logger *log.Logger) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+		md, _ := metadata.FromIncomingContext(ctx)
+		logger.Println(md)
+		return handler(ctx, req)
+	}
 }

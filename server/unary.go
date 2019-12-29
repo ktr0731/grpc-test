@@ -142,3 +142,11 @@ func (s *ExampleService) UnaryHeader(ctx context.Context, req *api.UnaryHeaderRe
 		Message: msg,
 	}, nil
 }
+
+func (s *ExampleService) UnaryWithMapResponse(ctx context.Context, req *api.SimpleRequest) (*api.MapResponse, error) {
+	m := map[string]*api.Name{}
+	m[req.GetName()] = nil
+	return &api.MapResponse{
+		Names: m,
+	}, nil
+}
