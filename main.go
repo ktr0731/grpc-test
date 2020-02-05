@@ -17,6 +17,7 @@ func main() {
 	cert := pflag.String("cert", "", "cert")
 	certKey := pflag.String("cert-key", "", "cert key")
 	rootCACert := pflag.String("root-ca-cert", "", "cert key")
+	emptyPackageService := pflag.Bool("empty-package-service", false, "register empty package service")
 	pflag.Parse()
 
 	var opts []server.Option
@@ -40,6 +41,9 @@ func main() {
 	}
 	if *rootCACert != "" {
 		opts = append(opts, server.WithRootCACert(*rootCACert))
+	}
+	if *emptyPackageService {
+		opts = append(opts, server.WithEmptyPackageService())
 	}
 
 	defer server.New(opts...).Serve().Stop()

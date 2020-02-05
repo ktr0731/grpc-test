@@ -14,6 +14,7 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/ktr0731/dept/logger"
 	"github.com/ktr0731/grpc-test/api"
+	"github.com/ktr0731/grpc-test/api/emptypackage"
 	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -80,6 +81,9 @@ func New(opts ...Option) *Server {
 
 	s := grpc.NewServer(grpcOpts...)
 	api.RegisterExampleServer(s, &ExampleService{logger: logger})
+	if opt.emptyPackageService {
+		emptypackage.RegisterEmptyPackageServiceServer(s, &EmptyPackageService{logger: logger})
+	}
 
 	if opt.reflection {
 		reflection.Register(s)

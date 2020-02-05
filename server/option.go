@@ -8,18 +8,19 @@ type opt struct {
 	protocol Protocol
 	addr     string
 
-	tls           bool
-	cert, certKey string
-	rootCACert    string
-	reflection    bool
-	verbose       bool
-	compressor    string
+	tls                 bool
+	cert, certKey       string
+	rootCACert          string
+	reflection          bool
+	verbose             bool
+	compressor          string
+	emptyPackageService bool
 }
 
 type Option func(*opt)
 
 var defaultOption = opt{
-	addr: ":50051",
+	addr: "0.0.0.0:50051",
 }
 
 type Protocol int
@@ -79,5 +80,11 @@ func WithVerbose() Option {
 func WithCompressor(c string) Option {
 	return func(o *opt) {
 		o.compressor = c
+	}
+}
+
+func WithEmptyPackageService() Option {
+	return func(o *opt) {
+		o.emptyPackageService = true
 	}
 }
