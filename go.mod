@@ -6,7 +6,6 @@ require (
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/improbable-eng/grpc-web v0.12.0
 	github.com/ktr0731/dept v0.1.3
-	github.com/ktr0731/go-multierror v0.0.0-20171204182908-b7773ae21874 // indirect
 	github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.6
