@@ -6,12 +6,21 @@ import (
 	"fmt"
 	"strings"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 
 	"github.com/ktr0731/grpc-test/api"
 )
 
 func (s *ExampleService) Unary(ctx context.Context, req *api.SimpleRequest) (*api.SimpleResponse, error) {
+	if err := grpc.SendHeader(ctx, metadata.New(map[string]string{"header_key1": "header_val1", "header_key2": "header_val2"})); err != nil {
+		return nil, err
+	}
+	if err := grpc.SetTrailer(ctx, metadata.New(map[string]string{"trailer_key1": "trailer_val1", "trailer_key2": "trailer_val2"})); err != nil {
+		return nil, err
+	}
 	return &api.SimpleResponse{
 		Message: fmt.Sprintf("hello, %s", req.GetName()),
 	}, nil
@@ -123,7 +132,7 @@ func (s *ExampleService) UnaryEnum(ctx context.Context, req *api.UnaryEnumReques
 func (s *ExampleService) UnaryBytes(ctx context.Context, req *api.UnaryBytesRequest) (*api.SimpleResponse, error) {
 	data := req.GetData()
 	msg := fmt.Sprintf("received: (bytes) % x, (string) %s", data, data)
-	s.logger.Println(msg)
+	s.Logger.Println(msg)
 	return &api.SimpleResponse{
 		Message: msg,
 	}, nil
@@ -149,4 +158,16 @@ func (s *ExampleService) UnaryWithMapResponse(ctx context.Context, req *api.Simp
 	return &api.MapResponse{
 		Names: m,
 	}, nil
+}
+
+func (s *ExampleService) UnaryHeaderTrailer(ctx context.Context, req *api.SimpleRequest) (*api.SimpleResponse, error) {
+	grpc.SendHeader(ctx, metadata.New(map[string]string{"header_key1": "header_val1", "header_key2": "header_val2"}))
+	grpc.SetTrailer(ctx, metadata.New(map[string]string{"trailer_key1": "trailer_val1", "trailer_key2": "trailer_val2"}))
+	return &api.SimpleResponse{Message: "response"}, nil
+}
+
+func (s *ExampleService) UnaryHeaderTrailerFailure(ctx context.Context, req *api.SimpleRequest) (*api.SimpleResponse, error) {
+	grpc.SendHeader(ctx, metadata.New(map[string]string{"header_key1": "header_val1", "header_key2": "header_val2"}))
+	grpc.SetTrailer(ctx, metadata.New(map[string]string{"trailer_key1": "trailer_val1", "trailer_key2": "trailer_val2"}))
+	return nil, status.Error(codes.Internal, "internal error")
 }

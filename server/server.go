@@ -80,7 +80,7 @@ func New(opts ...Option) *Server {
 	}
 
 	s := grpc.NewServer(grpcOpts...)
-	api.RegisterExampleServer(s, &ExampleService{logger: logger})
+	api.RegisterExampleServer(s, &ExampleService{Logger: logger})
 	if opt.emptyPackageService {
 		emptypackage.RegisterEmptyPackageServiceServer(s, &EmptyPackageService{logger: logger})
 	}
@@ -164,7 +164,7 @@ func (s *Server) Stop() error {
 }
 
 type ExampleService struct {
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 func newTLSConfig() *tls.Config {

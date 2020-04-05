@@ -3,13 +3,14 @@
 
 package emptypackage
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-
 import (
-	context "golang.org/x/net/context"
+	context "context"
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -21,7 +22,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type SimpleRequest struct {
 	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -34,16 +35,17 @@ func (m *SimpleRequest) Reset()         { *m = SimpleRequest{} }
 func (m *SimpleRequest) String() string { return proto.CompactTextString(m) }
 func (*SimpleRequest) ProtoMessage()    {}
 func (*SimpleRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_emptypackage_1cead27ff50271bc, []int{0}
+	return fileDescriptor_80735a2b7c208969, []int{0}
 }
+
 func (m *SimpleRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SimpleRequest.Unmarshal(m, b)
 }
 func (m *SimpleRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SimpleRequest.Marshal(b, m, deterministic)
 }
-func (dst *SimpleRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SimpleRequest.Merge(dst, src)
+func (m *SimpleRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SimpleRequest.Merge(m, src)
 }
 func (m *SimpleRequest) XXX_Size() int {
 	return xxx_messageInfo_SimpleRequest.Size(m)
@@ -72,16 +74,17 @@ func (m *SimpleResponse) Reset()         { *m = SimpleResponse{} }
 func (m *SimpleResponse) String() string { return proto.CompactTextString(m) }
 func (*SimpleResponse) ProtoMessage()    {}
 func (*SimpleResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_emptypackage_1cead27ff50271bc, []int{1}
+	return fileDescriptor_80735a2b7c208969, []int{1}
 }
+
 func (m *SimpleResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SimpleResponse.Unmarshal(m, b)
 }
 func (m *SimpleResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SimpleResponse.Marshal(b, m, deterministic)
 }
-func (dst *SimpleResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SimpleResponse.Merge(dst, src)
+func (m *SimpleResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SimpleResponse.Merge(m, src)
 }
 func (m *SimpleResponse) XXX_Size() int {
 	return xxx_messageInfo_SimpleResponse.Size(m)
@@ -104,13 +107,29 @@ func init() {
 	proto.RegisterType((*SimpleResponse)(nil), "SimpleResponse")
 }
 
+func init() { proto.RegisterFile("emptypackage.proto", fileDescriptor_80735a2b7c208969) }
+
+var fileDescriptor_80735a2b7c208969 = []byte{
+	// 148 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4a, 0xcd, 0x2d, 0x28,
+	0xa9, 0x2c, 0x48, 0x4c, 0xce, 0x4e, 0x4c, 0x4f, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x57, 0x52,
+	0xe6, 0xe2, 0x0d, 0xce, 0xcc, 0x2d, 0xc8, 0x49, 0x0d, 0x4a, 0x2d, 0x2c, 0x4d, 0x2d, 0x2e, 0x11,
+	0x12, 0xe2, 0x62, 0xc9, 0x4b, 0xcc, 0x4d, 0x95, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x02, 0xb3,
+	0x95, 0xb4, 0xb8, 0xf8, 0x60, 0x8a, 0x8a, 0x0b, 0xf2, 0xf3, 0x8a, 0x53, 0x85, 0x24, 0xb8, 0xd8,
+	0x73, 0x53, 0x8b, 0x8b, 0x13, 0xd3, 0x61, 0x0a, 0x61, 0x5c, 0x23, 0x47, 0x2e, 0x61, 0x57, 0x90,
+	0x35, 0x01, 0x10, 0x6b, 0x82, 0x53, 0x8b, 0xca, 0x32, 0x93, 0x53, 0x85, 0xb4, 0xb8, 0x58, 0x43,
+	0xf3, 0x12, 0x8b, 0x2a, 0x85, 0xf8, 0xf4, 0x50, 0xec, 0x93, 0xe2, 0xd7, 0x43, 0x35, 0x5a, 0x89,
+	0x21, 0x89, 0x0d, 0xec, 0x34, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0x87, 0x70, 0x9e, 0x4b,
+	0xb0, 0x00, 0x00, 0x00,
+}
+
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // EmptyPackageServiceClient is the client API for EmptyPackageService service.
 //
@@ -120,10 +139,10 @@ type EmptyPackageServiceClient interface {
 }
 
 type emptyPackageServiceClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewEmptyPackageServiceClient(cc *grpc.ClientConn) EmptyPackageServiceClient {
+func NewEmptyPackageServiceClient(cc grpc.ClientConnInterface) EmptyPackageServiceClient {
 	return &emptyPackageServiceClient{cc}
 }
 
@@ -139,6 +158,14 @@ func (c *emptyPackageServiceClient) Unary(ctx context.Context, in *SimpleRequest
 // EmptyPackageServiceServer is the server API for EmptyPackageService service.
 type EmptyPackageServiceServer interface {
 	Unary(context.Context, *SimpleRequest) (*SimpleResponse, error)
+}
+
+// UnimplementedEmptyPackageServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedEmptyPackageServiceServer struct {
+}
+
+func (*UnimplementedEmptyPackageServiceServer) Unary(ctx context.Context, req *SimpleRequest) (*SimpleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Unary not implemented")
 }
 
 func RegisterEmptyPackageServiceServer(s *grpc.Server, srv EmptyPackageServiceServer) {
@@ -174,20 +201,4 @@ var _EmptyPackageService_serviceDesc = grpc.ServiceDesc{
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "emptypackage.proto",
-}
-
-func init() { proto.RegisterFile("emptypackage.proto", fileDescriptor_emptypackage_1cead27ff50271bc) }
-
-var fileDescriptor_emptypackage_1cead27ff50271bc = []byte{
-	// 148 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4a, 0xcd, 0x2d, 0x28,
-	0xa9, 0x2c, 0x48, 0x4c, 0xce, 0x4e, 0x4c, 0x4f, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x57, 0x52,
-	0xe6, 0xe2, 0x0d, 0xce, 0xcc, 0x2d, 0xc8, 0x49, 0x0d, 0x4a, 0x2d, 0x2c, 0x4d, 0x2d, 0x2e, 0x11,
-	0x12, 0xe2, 0x62, 0xc9, 0x4b, 0xcc, 0x4d, 0x95, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x02, 0xb3,
-	0x95, 0xb4, 0xb8, 0xf8, 0x60, 0x8a, 0x8a, 0x0b, 0xf2, 0xf3, 0x8a, 0x53, 0x85, 0x24, 0xb8, 0xd8,
-	0x73, 0x53, 0x8b, 0x8b, 0x13, 0xd3, 0x61, 0x0a, 0x61, 0x5c, 0x23, 0x47, 0x2e, 0x61, 0x57, 0x90,
-	0x35, 0x01, 0x10, 0x6b, 0x82, 0x53, 0x8b, 0xca, 0x32, 0x93, 0x53, 0x85, 0xb4, 0xb8, 0x58, 0x43,
-	0xf3, 0x12, 0x8b, 0x2a, 0x85, 0xf8, 0xf4, 0x50, 0xec, 0x93, 0xe2, 0xd7, 0x43, 0x35, 0x5a, 0x89,
-	0x21, 0x89, 0x0d, 0xec, 0x34, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0x87, 0x70, 0x9e, 0x4b,
-	0xb0, 0x00, 0x00, 0x00,
 }
