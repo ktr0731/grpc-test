@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/ktr0731/grpc-test/api"
 )
 
@@ -170,4 +172,16 @@ func (s *ExampleService) UnaryHeaderTrailerFailure(ctx context.Context, req *api
 	grpc.SendHeader(ctx, metadata.New(map[string]string{"header_key1": "header_val1", "header_key2": "header_val2"}))
 	grpc.SetTrailer(ctx, metadata.New(map[string]string{"trailer_key1": "trailer_val1", "trailer_key2": "trailer_val2"}))
 	return nil, status.Error(codes.Internal, "internal error")
+}
+
+func (s *ExampleService) UnaryEcho(ctx context.Context, req *api.UnaryMessageRequest) (*api.SimpleResponse, error) {
+	m := &jsonpb.Marshaler{}
+	var buf bytes.Buffer
+	err := m.Marshal(&buf, req)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &api.SimpleResponse{
+		Message: buf.String(),
+	}, nil
 }
