@@ -14,6 +14,7 @@ import (
 
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/ktr0731/grpc-test/api"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 )
 
 func (s *ExampleService) Unary(ctx context.Context, req *api.SimpleRequest) (*api.SimpleResponse, error) {
@@ -171,7 +172,30 @@ func (s *ExampleService) UnaryHeaderTrailer(ctx context.Context, req *api.Simple
 func (s *ExampleService) UnaryHeaderTrailerFailure(ctx context.Context, req *api.SimpleRequest) (*api.SimpleResponse, error) {
 	grpc.SendHeader(ctx, metadata.New(map[string]string{"header_key1": "header_val1", "header_key2": "header_val2"}))
 	grpc.SetTrailer(ctx, metadata.New(map[string]string{"trailer_key1": "trailer_val1", "trailer_key2": "trailer_val2"}))
-	return nil, status.Error(codes.Internal, "internal error")
+	st := status.New(codes.Internal, "internal error")
+	st, err := st.WithDetails(
+		&errdetails.BadRequest{
+			FieldViolations: []*errdetails.BadRequest_FieldViolation{
+				{
+					Field:       "field",
+					Description: "description",
+				},
+			},
+		},
+		&errdetails.PreconditionFailure{
+			Violations: []*errdetails.PreconditionFailure_Violation{
+				{
+					Type:        "type",
+					Subject:     "subject",
+					Description: "description",
+				},
+			},
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return nil, st.Err()
 }
 
 func (s *ExampleService) UnaryEcho(ctx context.Context, req *api.UnaryMessageRequest) (*api.SimpleResponse, error) {
