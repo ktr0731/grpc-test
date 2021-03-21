@@ -165,6 +165,7 @@ func (s *Server) Stop() error {
 
 type ExampleService struct {
 	Logger *log.Logger
+	api.UnimplementedExampleServer
 }
 
 func newTLSConfig() *tls.Config {

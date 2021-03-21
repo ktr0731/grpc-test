@@ -10,6 +10,7 @@ import (
 
 type EmptyPackageService struct {
 	logger *log.Logger
+	emptypackage.UnimplementedEmptyPackageServiceServer
 }
 
 func (s *EmptyPackageService) Unary(ctx context.Context, req *emptypackage.SimpleRequest) (*emptypackage.SimpleResponse, error) {
