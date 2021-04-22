@@ -25,20 +25,20 @@ func (s *ExampleService) Unary(ctx context.Context, req *api.SimpleRequest) (*ap
 		return nil, err
 	}
 	return &api.SimpleResponse{
-		Message: fmt.Sprintf("hello, %s", req.GetName()),
+		Message: req.GetName(),
 	}, nil
 }
 
 func (s *ExampleService) UnaryMessage(ctx context.Context, req *api.UnaryMessageRequest) (*api.SimpleResponse, error) {
 	n := req.GetName()
 	return &api.SimpleResponse{
-		Message: fmt.Sprintf("hello, %s %s", n.GetFirstName(), n.GetLastName()),
+		Message: fmt.Sprintf("%s %s", n.GetFirstName(), n.GetLastName()),
 	}, nil
 }
 
 func (s *ExampleService) UnaryRepeated(ctx context.Context, req *api.UnaryRepeatedRequest) (*api.SimpleResponse, error) {
 	return &api.SimpleResponse{
-		Message: fmt.Sprintf("hello, %s", strings.Join(req.GetName(), ", ")),
+		Message: strings.Join(req.GetName(), ", "),
 	}, nil
 }
 
@@ -48,7 +48,7 @@ func (s *ExampleService) UnaryRepeatedMessage(ctx context.Context, req *api.Unar
 		names = append(names, fmt.Sprintf("%s %s", n.GetFirstName(), n.GetLastName()))
 	}
 	return &api.SimpleResponse{
-		Message: fmt.Sprintf("hello, %s", strings.Join(names, ", ")),
+		Message: strings.Join(names, ", "),
 	}, nil
 }
 
@@ -102,7 +102,7 @@ func (s *ExampleService) UnaryMapMessage(ctx context.Context, req *api.UnaryMapM
 		names = append(names, fmt.Sprintf("%s %s (nickname: %s)", v.GetFirstName(), v.GetLastName(), k))
 	}
 	return &api.SimpleResponse{
-		Message: fmt.Sprintf("hello, %s", strings.Join(names, ", ")),
+		Message: strings.Join(names, ", "),
 	}, nil
 }
 
@@ -115,7 +115,7 @@ func (s *ExampleService) UnaryOneof(ctx context.Context, req *api.UnaryOneofRequ
 		name = req.GetPlain()
 	}
 	return &api.SimpleResponse{
-		Message: fmt.Sprintf("hello, %s", name),
+		Message: name,
 	}, nil
 }
 
