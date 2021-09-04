@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "github.com/ktr0731/grpc-test/api/emptypackage";
+
 service EmptyPackageService {
   rpc Unary (SimpleRequest) returns (SimpleResponse) {}
 }

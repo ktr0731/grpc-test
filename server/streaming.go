@@ -61,7 +61,6 @@ func (s *ExampleService) serverStreaming(req *api.SimpleRequest, stm api.Example
 		if err != nil {
 			return err
 		}
-		time.Sleep(50 * time.Millisecond)
 	}
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	_ "embed"
 	"io"
 	"io/ioutil"
 	"log"
@@ -15,13 +16,10 @@ import (
 	"github.com/ktr0731/dept/logger"
 	"github.com/ktr0731/grpc-test/api"
 	"github.com/ktr0731/grpc-test/api/emptypackage"
-	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
-
-	_ "github.com/ktr0731/grpc-test/statik"
 )
 
 type Server struct {
@@ -168,29 +166,15 @@ type ExampleService struct {
 	api.UnimplementedExampleServer
 }
 
-func newTLSConfig() *tls.Config {
-	statikFS, err := fs.New()
-	if err != nil {
-		logger.Fatal(err)
-	}
+var (
+	//go:embed cert/localhost.pem
+	certPEM []byte
+	//go:embed cert/localhost-key.pem
+	keyPEM []byte
+)
 
-	certPEM, err := statikFS.Open("/localhost.pem")
-	if err != nil {
-		logger.Fatal(err)
-	}
-	keyPEM, err := statikFS.Open("/localhost-key.pem")
-	if err != nil {
-		logger.Fatal(err)
-	}
-	certPEMBytes, err := ioutil.ReadAll(certPEM)
-	if err != nil {
-		logger.Fatal(err)
-	}
-	keyPEMBytes, err := ioutil.ReadAll(keyPEM)
-	if err != nil {
-		logger.Fatal(err)
-	}
-	cert, err := tls.X509KeyPair(certPEMBytes, keyPEMBytes)
+func newTLSConfig() *tls.Config {
+	cert, err := tls.X509KeyPair(certPEM, keyPEM)
 	if err != nil {
 		logger.Fatal(err)
 	}

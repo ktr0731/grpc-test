@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "github.com/ktr0731/grpc-test/api";
+
 package api;
 
 service Example {
@@ -53,7 +55,7 @@ message UnaryRepeatedMessageRequest {
 }
 
 message UnaryRepeatedEnumRequest {
-  repeated Gender genders = 1;
+  repeated Choices choices = 1;
 }
 
 message UnarySelfRequest {
@@ -81,13 +83,13 @@ message UnaryOneofRequest {
   }
 }
 
-enum Gender {
-  Male = 0;
-  Female = 1;
+enum Choices {
+  Choice1 = 0;
+  Choice2 = 1;
 }
 
 message UnaryEnumRequest {
-  Gender gender = 1;
+  Choices choice = 1;
 }
 
 message UnaryBytesRequest {

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -11,8 +10,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/ktr0731/grpc-test/api"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 )
@@ -53,16 +52,16 @@ func (s *ExampleService) UnaryRepeatedMessage(ctx context.Context, req *api.Unar
 }
 
 func (s *ExampleService) UnaryRepeatedEnum(ctx context.Context, req *api.UnaryRepeatedEnumRequest) (*api.SimpleResponse, error) {
-	var m, f int
-	for _, g := range req.GetGenders() {
-		if g == api.Gender_Male {
-			m++
+	var c1, c2 int
+	for _, c := range req.GetChoices() {
+		if c == api.Choices_Choice1 {
+			c1++
 		} else {
-			f++
+			c2++
 		}
 	}
 	return &api.SimpleResponse{
-		Message: fmt.Sprintf("M: %d, F:%d", m, f),
+		Message: fmt.Sprintf("1: %d, 2:%d", c1, c2),
 	}, nil
 }
 
@@ -121,11 +120,11 @@ func (s *ExampleService) UnaryOneof(ctx context.Context, req *api.UnaryOneofRequ
 
 func (s *ExampleService) UnaryEnum(ctx context.Context, req *api.UnaryEnumRequest) (*api.SimpleResponse, error) {
 	var msg string
-	switch req.GetGender() {
-	case api.Gender_Male:
-		msg = "M"
+	switch req.GetChoice() {
+	case api.Choices_Choice1:
+		msg = "1"
 	default:
-		msg = "F"
+		msg = "2"
 	}
 	return &api.SimpleResponse{
 		Message: msg,
@@ -199,13 +198,11 @@ func (s *ExampleService) UnaryHeaderTrailerFailure(ctx context.Context, req *api
 }
 
 func (s *ExampleService) UnaryEcho(ctx context.Context, req *api.UnaryMessageRequest) (*api.SimpleResponse, error) {
-	m := &jsonpb.Marshaler{}
-	var buf bytes.Buffer
-	err := m.Marshal(&buf, req)
+	b, err := protojson.Marshal(req)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &api.SimpleResponse{
-		Message: buf.String(),
+		Message: string(b),
 	}, nil
 }
