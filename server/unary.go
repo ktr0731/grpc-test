@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -10,7 +11,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/ktr0731/grpc-test/api"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
@@ -198,7 +198,8 @@ func (s *ExampleService) UnaryHeaderTrailerFailure(ctx context.Context, req *api
 }
 
 func (s *ExampleService) UnaryEcho(ctx context.Context, req *api.UnaryMessageRequest) (*api.SimpleResponse, error) {
-	b, err := protojson.Marshal(req)
+	// Use json instead of protojson. See https://github.com/golang/protobuf/issues/1121.
+	b, err := json.Marshal(req)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
