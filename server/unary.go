@@ -190,6 +190,9 @@ func (s *ExampleService) UnaryHeaderTrailerFailure(ctx context.Context, req *api
 				},
 			},
 		},
+		&api.FailureDetail{
+			Code: "001",
+		},
 	)
 	if err != nil {
 		return nil, err

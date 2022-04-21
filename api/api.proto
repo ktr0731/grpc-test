@@ -85,7 +85,7 @@ message UnaryOneofRequest {
 
 enum Choices {
   Choice1 = 0;
-  Choice2 = 1;
+  Choice2 = 10;
 }
 
 message UnaryEnumRequest {
@@ -100,4 +100,8 @@ message UnaryHeaderRequest {}
 
 message MapResponse {
   map<string, Name> names = 1;
+}
+
+message FailureDetail {
+  string code = 1;
 }
