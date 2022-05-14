@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option go_package = "github.com/ktr0731/grpc-test/api";
+
+package api;
+
+import "independent2.proto";
+
+message IndependentFailureDetail {
+  FailureCode code = 1;
+}

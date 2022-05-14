@@ -8,5 +8,5 @@ tools:
 
 .PHONY: proto
 proto:
-	protoc --proto_path=$(GOPATH)/src --proto_path api --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative --go_out=api --go-grpc_out=api api/api.proto
+	protoc --proto_path=$(GOPATH)/src --proto_path api --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative --go_out=api --go-grpc_out=api api/api.proto api/independent*.proto
 	protoc --proto_path=$(GOPATH)/src --proto_path api --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative --go_out=api/emptypackage --go-grpc_out=api/emptypackage api/emptypackage.proto

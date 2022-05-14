@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option go_package = "github.com/ktr0731/grpc-test/api";
+
+package api;
+
+enum FailureCode {
+  FOO = 0;
+  BAR = 1;
+}
